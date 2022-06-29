@@ -2,7 +2,7 @@ App = {
     web3Provider: null,
     contracts: {},
     account: 'x0x',
-    lastLottery: 'x0x',
+    activeLottery: 'x0x',
 
     init: async function() {
   
@@ -62,9 +62,9 @@ App = {
     initLotteryInstance: async function () {
       
       App.contracts.Factory.deployed().then(async (instance) => {
-        var len = instance.deployedLotteries.length();
+        var len = await instance.lotteriesCount();
         if ( len != 0 ) {
-          lastLottery = instance.deployedLotteries[len - 1];
+          App.activeLottery = await instance.deployedLotteries(len -1);
         }
         else {
           alert("No Deployed Lottery, come back next time");

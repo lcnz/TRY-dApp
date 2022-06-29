@@ -18,6 +18,8 @@ contract Factory {
 
     address[] public deployedLotteries;
 
+    uint public lotteriesCount = 0;
+
     //event to log factory actions
     event NewLotteryCreated(string eventLog, address newLotteryAddress);
 
@@ -37,6 +39,7 @@ contract Factory {
         if ( deployedLotteries.length == 0 ) {
             tryInstance = new TRY(_K, _M, factoryOperator);
             deployedLotteries.push(address(tryInstance));
+            lotteriesCount ++;
         }
         else {
             address lastItem = deployedLotteries[deployedLotteries.length-1];
@@ -45,7 +48,8 @@ contract Factory {
 
             tryInstance = new TRY(_K, _M, factoryOperator);
             deployedLotteries.push(address(tryInstance));
-
+            lotteriesCount ++;
+            
             emit NewLotteryCreated("New Lottery has been created, enjoi with it", address(tryInstance));
         }
         return tryInstance;

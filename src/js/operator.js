@@ -3,7 +3,7 @@ App = {
   contracts: {},
   account: 'x0x',
   activeLottery: 'x0x',
-  lotteriesList: {},
+  lotteriesList: [],
   
   init: async function() {
 
@@ -64,13 +64,12 @@ App = {
   initLotteryInstance: async function () {
       
     App.contracts.Factory.deployed().then(async (instance) => {
-      var len = instance.deployedLotteries.length;
-      console.log(len);
+      var len = await instance.lotteriesCount(); //TODO: sistemare con variabile o trovare il modo di lavorare con array
       if ( len != 0 ) {
-        lastLottery = instance.deployedLotteries[len - 1];
+        App.activeLottery = await instance.deployedLotteries(len -1);
       }
       else {
-        alert("No Deployed Lottery");
+        console.log("No Deployed Lottery");
       }
     });
     return App.listenForEvents();
@@ -185,11 +184,11 @@ App = {
         $("#monitor").append("<br/>"+formatted);
       });
 
-    })
-    .catch(err => {
-      console.log(err);
-      alert("Lottery has not yet been deployed");
-    }); 
+    }, async (err) => {
+      console.log(err + "No lottery instance loaded");
+    }).catch(async (err) => {
+      console.log(err + "No lottery Loaded");
+    });
   },
 
   drawNumbers: function() {
