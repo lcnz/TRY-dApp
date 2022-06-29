@@ -19,40 +19,37 @@ contract Factory {
     address[] public deployedLotteries;
 
     uint public lotteriesCount = 0;
+    
+    TRY tryInstance;
 
     //event to log factory actions
     event NewLotteryCreated(string eventLog, address newLotteryAddress);
 
-    constructor() {
+    constructor(uint _K, uint _M) {
 
         factoryOperator = msg.sender;        
 
+        tryInstance = new TRY(_K, _M, factoryOperator);
+        deployedLotteries.push(address(tryInstance));
+        lotteriesCount ++;
     }
 
     /**
     * @dev start new Lottery 
     */
-    function createNewLottery(uint _K, uint _M)public onlyFactoryOperator returns(TRY instance){
+    function createNewLottery(uint _K, uint _M)public onlyFactoryOperator {
         
-        TRY tryInstance;
+        
+        address lastItem = deployedLotteries[deployedLotteries.length-1];
 
-        if ( deployedLotteries.length == 0 ) {
-            tryInstance = new TRY(_K, _M, factoryOperator);
-            deployedLotteries.push(address(tryInstance));
-            lotteriesCount ++;
-        }
-        else {
-            address lastItem = deployedLotteries[deployedLotteries.length-1];
+        require ( false == TRY(lastItem).checkLotteryActive(), "One active lottery Already exist, comeback next time");
 
-            require ( false == TRY(lastItem).checkLotteryActive(), "One active lottery Already exist, comeback next time");
+        tryInstance = new TRY(_K, _M, factoryOperator);
+        deployedLotteries.push(address(tryInstance));
+        lotteriesCount ++;
 
-            tryInstance = new TRY(_K, _M, factoryOperator);
-            deployedLotteries.push(address(tryInstance));
-            lotteriesCount ++;
-            
-            emit NewLotteryCreated("New Lottery has been created, enjoi with it", address(tryInstance));
-        }
-        return tryInstance;
+        emit NewLotteryCreated("New Lottery has been created, enjoi with it", address(tryInstance));
+
     }
   
 }

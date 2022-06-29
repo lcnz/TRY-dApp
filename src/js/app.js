@@ -55,19 +55,26 @@ App = {
             App.contracts.Factory = TruffleContract(c);
             App.contracts.Factory.setProvider(App.web3Provider);
 
+            return App.initLotteryInstance();
         });
-        return App.initLotteryInstance();
+        
     },
 
-    initLotteryInstance: async function () {
+    initLotteryInstance: function () {
       
       App.contracts.Factory.deployed().then(async (instance) => {
-        var len = await instance.lotteriesCount();
+        var len = await instance.lotteriesCount(); 
         if ( len != 0 ) {
-          App.activeLottery = await instance.deployedLotteries(len -1);
+          //App.activeLottery = await instance.deployedLotteries(len - 1);
+            instance.deployedLotteries(len - 1).then( (lotteryAddr) => {
+            App.activeLottery = lotteryAddr;  
+            return App.listenForEvents();
+          }).catch( async (err) => {
+            console.log(err);
+          });
         }
         else {
-          alert("No Deployed Lottery, come back next time");
+          console.log("A lottery has not yet been deployed");
         }
       });
       

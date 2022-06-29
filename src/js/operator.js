@@ -3,7 +3,6 @@ App = {
   contracts: {},
   account: 'x0x',
   activeLottery: 'x0x',
-  lotteriesList: [],
   
   init: async function() {
 
@@ -61,21 +60,27 @@ App = {
       });
   },
 
-  initLotteryInstance: async function () {
+  initLotteryInstance: function () {
       
     App.contracts.Factory.deployed().then(async (instance) => {
-      var len = await instance.lotteriesCount(); //TODO: sistemare con variabile o trovare il modo di lavorare con array
+      var len = await instance.lotteriesCount(); 
       if ( len != 0 ) {
-        App.activeLottery = await instance.deployedLotteries(len -1);
+        //App.activeLottery = await instance.deployedLotteries(len - 1);
+        instance.deployedLotteries(len - 1).then( (lotteryAddr) => {
+          App.activeLottery = lotteryAddr;  
+          return App.listenForEvents();
+        }).catch( async (err) => {
+          console.log(err);
+        });
       }
       else {
-        console.log("No Deployed Lottery");
+        console.log("A lottery has not yet been deployed");
       }
     });
-    return App.listenForEvents();
+    
   }, 
 
-  createNewLottery: async function () {
+  createNewLottery: function () {
 
     //save the state of the lottery, to serialize and use later
     
@@ -87,37 +92,19 @@ App = {
     if ( !isNaN(_K) && !isNaN(_M)){
 
       App.contracts.Factory.deployed().then(async(instance) => {
-
-        try{
-          var tryInstance = await instance.createNewLottery(_K, _M, {from: App.account});
-
-          App.lotteriesList.push(tryInstance.address);
+        
+        instance.createNewLottery(_K, _M, {from: App.account}).then( (tryInstance) => {
           App.activeLottery = tryInstance.address;
-        }
-        catch (err) {
+        }).catch( (err) => {
           console.log(err);
           alert(err);
-        }
+        });
+        
       });
     }
     else {
       alert("Must input numbers");
     }
-  },
-
-  startNewRound: function() {
-
-    App.contracts.TRY.at(App.activeLottery).then(async(instance) => {
-
-      try{
-        await instance.startNewRound({from: App.account});
-        console.log("new round fired");
-      }
-      catch (error) {
-        alert(error);
-      }
-    });
-    
   },
 
   listenForEvents: function() {
@@ -126,11 +113,12 @@ App = {
       instance.NewLotteryCreated().on('data', function (event) {
         var ms = Date.now();
         console.log("Event New Lottery Created catched");
-        var formatted = "> "+"timestamp: "+ ms + ", Event: "+ event.returnValues.eventLog + ", New Lottery Address: " + newLotteryAddress;
+        var formatted = "> "+"timestamp: "+ ms + ", Event: "+ event.returnValues.eventLog + ", New Lottery Address: " + event.returnValues.newLotteryAddress;
         console.log(formatted);
         $("#monitor").append("<br/>"+formatted);
       });
     });
+
 
     App.contracts.TRY.at(App.activeLottery).then(async (instance) => {
 
@@ -184,11 +172,25 @@ App = {
         $("#monitor").append("<br/>"+formatted);
       });
 
-    }, async (err) => {
-      console.log(err + "No lottery instance loaded");
-    }).catch(async (err) => {
-      console.log(err + "No lottery Loaded");
+    }).catch( async (err) => {
+      console.log(err);
     });
+  },
+
+  startNewRound: function() {
+
+    App.contracts.TRY.at(App.activeLottery).then(async(instance) => {
+
+      instance.startNewRound({from: App.account}).then( (res) => {
+        console.log(res);
+      }).catch((err) => {
+        alert(err);
+      });
+    }).catch(async(err) => {
+      console.log(err);
+      alert("First of all, create a new lottery");
+    });
+    
   },
 
   drawNumbers: function() {
@@ -202,10 +204,7 @@ App = {
       catch (error) {
         alert(error);
       }
-        /*.then(
-        function() {console.log("draw numbers");},
-        function(error) {console.log(error)}
-      );*/
+
     });
     
   },
