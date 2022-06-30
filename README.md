@@ -1,15 +1,4 @@
-# Material of the P2P and Blockchains Course
-
-## Folders
-
-- contracts: contains the smart contracts
-- - DAppContract.sol: Contract used for TRY DApp
-- - Migrations.sol: Truffle's
-- - TryKitty.sol: Contract used to show how to test a contract during the class
-
-- migrations: Truffle's migration scripts folder
-
-- src: contains the DApp html, js, and css files
+# Final Project
 
 ## Execute the DApp
 

@@ -81,34 +81,27 @@ App = {
     }, 
 
     manageAsOperator: async function () {
-        //check if coofntract is already deployed and in the address of the account is the same 
-        //that deployed the contract if yes ok otherwise alert the user
-        console.log("manage as operator ");
-        var factoryInstance = null;
-        var isDeployed = false;
-        try {
-            factoryInstance = await App.contracts.Factory.deployed();
-            if( factoryInstance.deployedLotteries.length() != 0) {
-              isDeployed = true;
-            }
-              
-        } catch (error) {
+      //check if coofntract is already deployed and in the address of the account is the same 
+      //that deployed the contract if yes ok otherwise alert the user
+      console.log("manage as operator ");
+      var factoryInstance = null;
 
-            console.log(error);
-        }
-        if (!isDeployed) {
-            window.location.href = "operator.html";
-        }
-        else {
-            var factoryOp = await factoryInstance.factoryOperator();
-            console.log("factory operator: "+ lotteryOp );
-            if ( lotteryOp.toLowerCase() == App.account) {
-                window.location.href = "operator.html";
-            }
-            else {
-                alert("Enjoy the lottery as Gambler!!");
-            }
-        }
+      try {
+          factoryInstance = await App.contracts.Factory.deployed();
+            
+      } catch (error) {
+
+          console.log(error);
+      }
+      
+      var factoryOp = await factoryInstance.factoryOperator();
+      console.log("factory operator: "+ factoryOp );
+      if ( factoryOp.toLowerCase() == App.account) {
+          window.location.href = "operator.html";
+      }
+      else {
+          alert("Enjoy the lottery as Gambler!!");
+      }
     },
 
     listenForEvents: function() {
