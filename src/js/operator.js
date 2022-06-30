@@ -68,7 +68,9 @@ App = {
         //App.activeLottery = await instance.deployedLotteries(len - 1);
         instance.deployedLotteries(len - 1).then( (lotteryAddr) => {
           App.activeLottery = lotteryAddr;  
+          console.log("lotteryaddr ->" + lotteryAddr);
           return App.listenForEvents();
+          
         }).catch( async (err) => {
           console.log(err);
         });
@@ -183,6 +185,7 @@ App = {
 
       instance.startNewRound({from: App.account}).then( (res) => {
         console.log(res);
+        console.log("new round fired");
       }).catch((err) => {
         alert(err);
       });

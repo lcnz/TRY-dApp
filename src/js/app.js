@@ -116,7 +116,7 @@ App = {
         App.contracts.Factory.deployed().then(async (instance) => {
           instance.NewLotteryCreated().on('data', function (event) {
             console.log("Event New Lottery Created catched");
-            var formatted = "Event: "+ event.returnValues.eventLog + ", New Lottery Address: " + newLotteryAddress;
+            var formatted = "Event: "+ event.returnValues.eventLog + ", New Lottery Address: " + event.returnValues.newLotteryAddress;
             console.log(formatted);
             alert(formatted);
             return App.initLotteryInstance();

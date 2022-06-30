@@ -5,12 +5,13 @@ import "./TRY.sol";
 
 /**
  * @title Factory
- * @dev Factory Lottery deploy TRY contract
+ * @dev Factory Lottery deploy TRY instance contract
  */
 contract Factory {
 
-    address public factoryOperator; //lottery operator
-    //modifier
+    address public factoryOperator; //factory operator
+    
+    //modifier used to restrict the usage of create new lottery function
     modifier onlyFactoryOperator {
         require(msg.sender == factoryOperator, "Only the factory operator can use this function");
         _;
