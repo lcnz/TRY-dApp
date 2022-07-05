@@ -1,4 +1,4 @@
-# Final Project
+# Final Project - P2P Systems and Blockchains
 
 ## Execute the DApp
 
